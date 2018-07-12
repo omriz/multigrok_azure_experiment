@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: multigrok
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    run: multigrok
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multigrok
+spec:
+  selector:
+    matchLabels:
+      run: multigrok
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: multigrok
+    spec:
+      containers:
+      - name: multigrok
+        image: omrizcontainerbuilder.azurecr.io/multigrok:v1
+        command: ["/main"]
+        args: ["--http_port","8080","--backends", "http://opengrok-deps:8080/source,http://opengrok-multigrok:8080/source,http://opengrok-bootstrap:8080/source"]
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+      - name: acr-auth

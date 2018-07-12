@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: opengrok-deps
+  labels:
+    run: opengrok-deps
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    run: opengrok-deps
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: opengrok-deps
+spec:
+  selector:
+    matchLabels:
+      run: opengrok-deps
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: opengrok-deps
+    spec:
+      containers:
+      - name: opengrok-deps
+        image: omrizcontainerbuilder.azurecr.io/opengrok:v1
+        env:
+            - name: MONITORED_REPOSITORIES
+              value: https://github.com/hashicorp/golang-lru.git,https://go.googlesource.com/crypto,https://go.googlesource.com/net,https://go.googlesource.com/sync
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+      - name: acr-auth

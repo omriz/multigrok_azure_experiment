@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: grok-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+  - hosts:
+    - omrizk8s.ddns.net
+    secretName: tls-secret
+  rules:
+  - host: omrizk8s.ddns.net
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: multigrok
+          servicePort: 80
